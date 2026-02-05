@@ -1,0 +1,19 @@
+{
+  "md_spreadsheet_id": "1v51pUSPbwfLKRW_TS93HCt1EV6VlPoZQBBaEzjUVG7o",
+  "google_account_auth": "one-crm-production-service_account.json",
+  "dataset_id": "one-crm-production.ONE_MRO",
+  "turnover_table": "turnover",
+  "upload_log_table": "uploadlog",
+  "md_customers_table": "md_customers",
+  "md_plants_table": "md_plants",
+  "md_productfamilies_table": "md_productfamilies",
+  "md_members_table": "md_members",
+  "md_branches_table": "md_branches",
+  "md_suppliers_table": "md_suppliers",
+  "smtp_server": "mail.one4europe.eu",
+  "smtp_port": 25,
+  "username": "",
+  "password": "",
+  "email_from": "reporting@one4europe.eu",
+  "email_cc": "hboie@one-mrosupply.com"
+}

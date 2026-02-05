@@ -1,0 +1,9 @@
+{
+  "email": "hans.boie@boie.de",
+  "delimiter": ";",
+  "column_names": ["code_of_integration", "member_branch_id", "plant_id", "product_family_id", "supplier_id", "product_id", 
+                "supplier_product_reference", "product_description", "unit_net_price", "quantity", "turnover", "price_per", "sales_unit",
+                "delivery_date", "invoice_date", "year", "month", "quarter", "semester", "member_order_nb", "customer_order_nb", "deliver_note",
+                "invoice_nb", "customer_reference", "member_internal_reference", "buying_member_id", "member_id"],
+  "skiprows": 0
+}
