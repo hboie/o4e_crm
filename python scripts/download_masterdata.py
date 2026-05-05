@@ -3,7 +3,7 @@
 
 # ## Import ##
 
-# In[7]:
+# In[1]:
 
 
 import json
@@ -15,7 +15,7 @@ from google.oauth2 import service_account
 
 # ## load configuration ##
 
-# In[8]:
+# In[2]:
 
 
 environment = 'prod'
@@ -28,7 +28,7 @@ finally:
 environment
 
 
-# In[9]:
+# In[3]:
 
 
 if environment == 'test':
@@ -44,7 +44,7 @@ config_file
 
 # ## Connect to google drive ##
 
-# In[10]:
+# In[4]:
 
 
 service_account_file = config["google_account_auth"]
@@ -58,7 +58,7 @@ sheets_service = build('sheets', 'v4', credentials=credentials)
 
 # ## access master data file ##
 
-# In[11]:
+# In[5]:
 
 
 spreadsheet_id = config['md_spreadsheet_id']
@@ -70,10 +70,11 @@ targets =[
     { 'sheet_name': 'MD_SUPPLIERS', 'columns': 2, 'filename': './data/suppliers.pkl' },
     { 'sheet_name': 'MD_PRODUCTFAMILIES', 'columns': 3, 'filename': './data/productfamilies.pkl' },
     { 'sheet_name': 'MD_MONTHS', 'columns': 3, 'filename': './data/months.pkl' },
+    { 'sheet_name': 'MD_PROJECT_PARTNER', 'columns': 4, 'filename': './data/projectpartners.pkl' },
 ]
 
 
-# In[13]:
+# In[6]:
 
 
 for target in targets:
@@ -98,16 +99,4 @@ for target in targets:
         data_df.to_pickle(target['filename'])
 
         print(target['sheet_name'] + ': saved data to file ' + target['filename'])
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 

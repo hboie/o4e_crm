@@ -4,7 +4,7 @@
 # # import #
 # 
 
-# In[9]:
+# In[20]:
 
 
 import json
@@ -22,7 +22,7 @@ import schema
 
 # ## import configuration ##
 
-# In[10]:
+# In[21]:
 
 
 environment = 'prod'
@@ -35,7 +35,7 @@ finally:
 environment
 
 
-# In[11]:
+# In[22]:
 
 
 if environment == 'test':
@@ -53,10 +53,10 @@ config_file
 # 
 # try to load data from template without headers
 
-# In[12]:
+# In[27]:
 
 
-import_file = 'CA_FAIR_012026.csv'
+import_file = 'Salesforce 032026.csv'
 log_file = 'import.log'
 partner = 'testpartner'
 date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -77,7 +77,7 @@ if re.match('import_turnover.py', sys.argv[0]):
 
 # import data from file
 
-# In[13]:
+# In[28]:
 
 
 with open(log_file, "w") as logfile:
@@ -86,7 +86,7 @@ with open(log_file, "w") as logfile:
 
 # detect encoding
 
-# In[14]:
+# In[29]:
 
 
 sample_size=100000
@@ -103,7 +103,7 @@ with open(log_file, "a") as logfile:
 
 # define import setting
 
-# In[15]:
+# In[32]:
 
 
 column_names = ['code_of_integration', 'member_branch_id', 'plant_id', 'product_family_id', 'supplier_id', 'product_id', 
@@ -120,7 +120,7 @@ kwargs['delimiter'] = ';'
 kwargs['skiprows'] = 0
 
 
-# In[16]:
+# In[33]:
 
 
 if partner_config_file != '':
@@ -152,25 +152,25 @@ if partner_config_file != '':
             print(f"using decimal '{kwargs['decimal']}'")
 
 
-# In[17]:
+# In[34]:
 
 
 inp_df = pd.read_csv(**kwargs)
 
 
-# In[18]:
+# In[35]:
 
 
 inp_df.head(10)
 
 
-# In[19]:
+# In[36]:
 
 
 inp_df.info()
 
 
-# In[20]:
+# In[37]:
 
 
 with open(log_file, "a") as logfile:
@@ -179,8 +179,22 @@ with open(log_file, "a") as logfile:
 
 # ## clean data ##
 
-# In[21]:
+# In[38]:
 
+
+missing_columns = [c for c in column_names if c not in set(kwargs['names'])]
+missing_mandatory = []
+missing_empty = []
+for col in missing_columns:
+    if col in ['product_id', 'sales_unit', 'delivery_date', 'quarter', 'semester', 'member_order_nb', 'customer_order_nb', 'deliver_note',
+                'invoice_nb', 'customer_reference', 'member_internal_reference', 'buying_member_id']:
+        inp_df[col] = ''
+        missing_empty.append("'" + col + "'")
+    elif col in ['unit_net_price', 'price_per']:
+        inp_df[col] = 0.0
+        missing_empty.append("'" + col + "'")
+    else:
+        missing_mandatory.append("'" + col + "'")
 
 inp_df = inp_df.fillna('')
 inp_df['code_of_integration']=inp_df['code_of_integration'].astype("string")
@@ -198,20 +212,6 @@ inp_df['customer_reference']=inp_df['customer_reference'].astype("string")
 inp_df['member_internal_reference']=inp_df['member_internal_reference'].astype("string")
 inp_df['member_id']=inp_df['member_id'].astype("string")
 
-missing_columns = [c for c in column_names if c not in set(kwargs['names'])]
-missing_mandatory = []
-missing_empty = []
-for col in missing_columns:
-    if col in ['product_id', 'sales_unit', 'delivery_date', 'quarter', 'semester', 'member_order_nb', 'customer_order_nb', 'deliver_note',
-                'invoice_nb', 'customer_reference', 'member_internal_reference', 'buying_member_id']:
-        inp_df[col] = ''
-        missing_empty.append("'" + col + "'")
-    elif col in ['unit_net_price', 'price_per']:
-        inp_df[col] = 0.0
-        missing_empty.append("'" + col + "'")
-    else:
-        missing_mandatory.append("'" + col + "'")
-
 message = ''
 if len(missing_empty) > 0:
     missing_empty_str = ", ".join(missing_empty)
@@ -225,13 +225,13 @@ if message:
         logfile.write(message)
 
 
-# In[24]:
+# In[39]:
 
 
 inp_df.head(10)
 
 
-# In[25]:
+# In[40]:
 
 
 inp_df.info()
@@ -241,42 +241,42 @@ inp_df.info()
 
 # load master data
 
-# In[26]:
+# In[41]:
 
 
 plants_df = pd.read_pickle('./data/plants.pkl')
 plants_df.head()
 
 
-# In[27]:
+# In[42]:
 
 
 productfamilies_df = pd.read_pickle('./data/productfamilies.pkl')
 productfamilies_df.head()
 
 
-# In[28]:
+# In[43]:
 
 
 members_df = pd.read_pickle('./data/members.pkl')
 members_df.head()
 
 
-# In[29]:
+# In[44]:
 
 
 branches_df = pd.read_pickle('./data/branches.pkl')
 branches_df.head()
 
 
-# In[30]:
+# In[45]:
 
 
 suppliers_df = pd.read_pickle('./data/suppliers.pkl')
 suppliers_df.head()
 
 
-# In[31]:
+# In[46]:
 
 
 months_df = pd.read_pickle('./data/months.pkl')
@@ -285,7 +285,7 @@ months_df.head()
 
 # create new dataframe
 
-# In[32]:
+# In[47]:
 
 
 df = pd.DataFrame({
@@ -310,7 +310,7 @@ df = pd.DataFrame({
 
 # loop through dataframe and verify data
 
-# In[33]:
+# In[48]:
 
 
 count_import = 0
@@ -500,19 +500,19 @@ for index, row in inp_df.iterrows():
 result_msg = f"imported {count_import} lines, rejected {count_reject} lines, ignored {count_member_to_member} member-to-member lines and {count_purchase} purchase lines"
 
 
-# In[34]:
+# In[49]:
 
 
 print(result_msg)
 
 
-# In[397]:
+# In[50]:
 
 
 df.head()
 
 
-# In[398]:
+# In[51]:
 
 
 with open(log_file, "a") as logfile:
@@ -522,7 +522,7 @@ with open(log_file, "a") as logfile:
 
 # # connect to database #
 
-# In[399]:
+# In[52]:
 
 
 service_account_file = config["google_account_auth"]
@@ -534,7 +534,7 @@ credentials = service_account.Credentials.from_service_account_file(
 client = bigquery.Client(credentials=credentials, project=credentials.project_id)
 
 
-# In[400]:
+# In[53]:
 
 
 dataset_id = config['dataset_id']
@@ -543,7 +543,7 @@ table_id = dataset_id + "." + config['turnover_table']
 
 # ## delete existing lines with contained codes of integration ##
 
-# In[401]:
+# In[54]:
 
 
 coi_list = df['code_of_integration'].unique()
@@ -566,14 +566,14 @@ if len(coi_list) > 0:
 
 # ## upload data ##
 
-# In[402]:
+# In[55]:
 
 
 chunk_size = 1000
 chunks = [df.iloc[i:i+chunk_size] for i in range(0, len(df), chunk_size)]
 
 
-# In[403]:
+# In[56]:
 
 
 job_config = bigquery.LoadJobConfig(
@@ -622,7 +622,7 @@ for chunk_df in chunks:
         upload_errors.append(f"error: upload failed: {e}")
 
 
-# In[404]:
+# In[57]:
 
 
 client.close()
@@ -630,7 +630,7 @@ client.close()
 
 # check results
 
-# In[405]:
+# In[58]:
 
 
 with open(log_file, "a") as logfile:
