@@ -3,7 +3,7 @@
 
 # ## Import ##
 
-# In[1]:
+# In[12]:
 
 
 import json
@@ -15,7 +15,7 @@ import io
 
 # ## load configuration ##
 
-# In[2]:
+# In[13]:
 
 
 environment = 'prod'
@@ -28,7 +28,7 @@ finally:
 environment
 
 
-# In[3]:
+# In[14]:
 
 
 if environment == 'test':
@@ -44,13 +44,13 @@ config_file
 
 # ## Connect to google drive ##
 
-# In[4]:
+# In[15]:
 
 
 service_account_file = config["google_account_auth"]
 credentials = service_account.Credentials.from_service_account_file(
     service_account_file,
-    scopes=['https://www.googleapis.com/auth/spreadsheets.readonly']
+    scopes=['https://www.googleapis.com/auth/drive.readonly']
 )
 
 drive_service = build('drive', 'v3', credentials=credentials)
@@ -58,22 +58,28 @@ drive_service = build('drive', 'v3', credentials=credentials)
 
 # ## download template ##
 
-# In[5]:
+# In[16]:
 
 
 spreadsheet_id = config['template_spreadsheet_id']
+target_filename = './data/ONE CRM reporting template.xlsx'
 
-request = drive_service.files().export_media(
-    fileId=spreadsheet_id,
-    mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-)
+try:
+    request = drive_service.files().get_media(fileId=spreadsheet_id)
+    fh = io.FileIO(target_filename, 'wb')
+    downloader = MediaIoBaseDownload(fh, request)
 
-fh = io.FileIO('output.xlsx', 'wb')
-downloader = MediaIoBaseDownload(fh, request)
+    done = False
+    while not done:
+        status, done = downloader.next_chunk()
 
-done = False
-while not done:
-    status, done = downloader.next_chunk()
+    print(f"Download to {target_filename} finished.")
+except HttpError as error:
+    print(f"An error occurred: {error}")
 
-print(f"Download finished.")
+
+# In[ ]:
+
+
+
 
