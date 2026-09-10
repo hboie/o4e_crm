@@ -7,5 +7,6 @@
                 "invoice_nb", "customer_reference", "member_internal_reference", "buying_member_id", "member_id"],
   "skiprows": 0,
   "thousands": ",",
-  "decimal": "."
+  "decimal": ".",
+  "set_values": {"member_id": "000001_XXXX"}
 }
